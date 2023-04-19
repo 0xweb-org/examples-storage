@@ -1,0 +1,11 @@
+{
+  "contracts": {
+    "eth": {
+      "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": {
+        "name": "USDC",
+        "main": "./0xweb/eth/USDC/USDC.ts",
+        "implementation": "0xa2327a938febf5fec13bacfb16ae10ecbc4cbdcf"
+      }
+    }
+  }
+}
