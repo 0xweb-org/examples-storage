@@ -7,6 +7,7 @@ import { ChainAccount } from '@dequanto/models/TAccount';
 import { $require } from '@dequanto/utils/$require';
 import { UAction } from 'atma-utest'
 import { $bigint } from '@dequanto/utils/$bigint';
+import { File } from 'atma-io';
 
 
 let config = await Config.fetch({
@@ -81,4 +82,42 @@ UAction.create({
         let tx = await usdc.transfer(foo as ChainAccount, bar.address, fooBalance);
         let receipt = await tx.wait();
     },
+
+    async '!redeploy-with-new-compilation' () {
+        let path = '0xweb/eth/USDC/USDC/FiatTokenV2_1.sol';
+        let source = await File.readAsync<string>(path);
+        /**
+         * Simulate file edits by user
+         */
+        source = source.replaceAll(`_transfer(msg.sender, to, value);`, `_transfer(msg.sender, to, value + 5);`);
+
+        let output = `./test/bin/contracts/USDC.sol`;
+        await File.writeAsync(output, source);
+
+        let { bytecode } = await provider.compileSol(output);
+        let usdc = new USDC(void 0, client);
+
+        await client.debug.setCode(usdc.address, bytecode);
+
+        let foo = await accounts.get('foo');
+        let bar = await accounts.get('bar');
+
+        await client.debug.setBalance(foo.address, 10n ** 18n);
+
+        await usdc.storage.$set(`balances["${foo.address}"]`, 100n);
+        await usdc.storage.$set(`balances["${bar.address}"]`, 0n);
+
+        let barBalanceBefore = await usdc.balanceOf(bar.address);
+        l`Bar Balance: ${barBalanceBefore}`;
+
+        let fooBalanceBefore = await usdc.balanceOf(foo.address);
+        l`Foo Balance: ${fooBalanceBefore}`;
+
+        let tx = await usdc.transfer(foo as ChainAccount, bar.address, 50n);
+        await tx.wait();
+
+
+        let barBalance = await usdc.balanceOf(bar.address);
+        l`Bar Balance: ${barBalance}`;
+    }
 });

@@ -1,16 +1,13 @@
 import memd from 'memd';
-import hre from "hardhat";
-
-import { HardhatWeb3Client } from '@dequanto/clients/HardhatWeb3Client';
+import { run } from 'shellbee'
 import { Socket } from 'net';
 import { Shell } from 'shellbee'
-import { $config } from '@dequanto/utils/$config';
 import { HardhatProvider } from '@dequanto/hardhat/HardhatProvider';
 
 const PORT = `8545`;
 const HOST = `http://127.0.0.1:${PORT}/`
 
-export class TestNode {
+export class TestUtils {
     static PORT = PORT
     static HOST = HOST
 
@@ -25,6 +22,15 @@ export class TestNode {
             shell.run();
             await shell.onReadyAsync();
         }
+    }
+
+    static async execute (command: string) {
+        let shell = await run({
+            command,
+            silent: true,
+        });
+        let stdout = shell.stdout.join('\n');
+        return stdout;
     }
 }
 

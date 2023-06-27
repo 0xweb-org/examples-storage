@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "hardhat": "node --openssl-legacy-provider ./node_modules/hardhat/internal/cli/cli.js node --hostname 127.0.0.1",
+    "generate": "0xweb i 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48 --name USDC --chain eth",
     "test": "atma test"
   },
   "atma": {
@@ -32,7 +33,7 @@
     "@nomiclabs/hardhat-waffle": "^2.0.5",
     "@nomiclabs/hardhat-web3": "^2.0.0",
     "@solidity-parser/parser": "^0.16.0",
-    "0xweb": "^0.9.76",
+    "0xweb": "^0.9.86",
     "a-di": "^1.0.25",
     "alot": "^0.3.5",
     "appcfg": "^0.4.64",

@@ -1,5 +1,5 @@
 /**
- *  AUTO-Generated Class: 2023-04-22 21:00
+ *  AUTO-Generated Class: 2023-06-13 21:29
  *  Implementation: https://etherscan.io/address/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48#code
  */
 import di from 'a-di';
@@ -9,7 +9,7 @@ import { TBufferLike } from '@dequanto/models/TBufferLike';
 import { ClientEventsStream, TClientEventsStreamData } from '@dequanto/clients/ClientEventsStream';
 import { ContractBase } from '@dequanto/contracts/ContractBase';
 import { ContractStorageReaderBase } from '@dequanto/contracts/ContractStorageReaderBase';
-import { type AbiItem } from 'web3-utils';
+import type { AbiItem } from 'web3-utils';
 import type { BlockTransactionString } from 'web3-eth';
 import { TransactionReceipt, Transaction, EventLog } from 'web3-core';
 import { TxWriter } from '@dequanto/txs/TxWriter';
@@ -758,7 +758,7 @@ type TSender = TAccount & {
     };
     type TLogOwnershipTransferredParameters = [ previousOwner: TAddress, newOwner: TAddress ];
     type TLogPause = {
-        
+
     };
     type TLogPauseParameters = [  ];
     type TLogPauserChanged = {
@@ -778,7 +778,7 @@ type TSender = TAccount & {
     };
     type TLogUnBlacklistedParameters = [ _account: TAddress ];
     type TLogUnpause = {
-        
+
     };
     type TLogUnpauseParameters = [  ];
 
@@ -800,7 +800,7 @@ interface IEvents {
   Transfer: TLogTransferParameters
   UnBlacklisted: TLogUnBlacklistedParameters
   Unpause: TLogUnpauseParameters
-  '*': any[] 
+  '*': any[]
 }
 
 
@@ -1106,7 +1106,7 @@ interface IMethods {
   updatePauser: IMethodUpdatePauser
   updateRescuer: IMethodUpdateRescuer
   version: IMethodVersion
-  '*': { method: string, arguments: any[] } 
+  '*': { method: string, arguments: any[] }
 }
 
 
