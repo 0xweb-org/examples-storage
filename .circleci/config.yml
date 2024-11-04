@@ -14,14 +14,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Checkout submodules
-          command: git submodule update --init --recursive
+          name: NPM 0xweb
+          command: npm install 0xweb@latest
       - run:
-          name: NPM install
-          command: npm install --force
+          name: 0xweb init
+          command: npx 0xweb init
       - run:
-          name: Restore contracts
-          command: npx 0xweb restore
+          name: Install USDC
+          command: npx 0xweb i 0xa2327a938febf5fec13bacfb16ae10ecbc4cbdcf --chain eth --name USDC
       - run:
           name: Run tests
           command: npm run test

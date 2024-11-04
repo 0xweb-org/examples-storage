@@ -3,3 +3,6 @@ cache
 artifacts
 config
 /test/bin/
+/0xc
+package.json
+package-lock.json

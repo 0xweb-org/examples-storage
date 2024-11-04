@@ -1,6 +1,19 @@
 {
   "extends": "./tsconfig-base.json",
   "compilerOptions": {
-    "module": "ESNext"
+    "module": "ESNext",
+    "paths": {
+      "@dequanto/*": [
+        "dequanto/src/*"
+      ],
+      "@dequanto-contracts/*": [
+        "dequanto/contracts/*"
+      ],
+      "0xc/*": [
+        "0xc/*"
+      ]
+    },
+    "baseUrl": "./",
+    "moduleResolution": "node"
   }
 }
