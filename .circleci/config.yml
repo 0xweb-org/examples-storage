@@ -18,10 +18,10 @@ jobs:
           command: npm install 0xweb@latest
       - run:
           name: 0xweb init
-          command: npx 0xweb init
+          command: npx 0xweb init --hardhat
       - run:
           name: Install USDC
-          command: npx 0xweb i 0xa2327a938febf5fec13bacfb16ae10ecbc4cbdcf --chain eth --name USDC
+          command: npx 0xweb i 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48 --chain eth --name USDC
       - run:
           name: Run tests
           command: npm run test

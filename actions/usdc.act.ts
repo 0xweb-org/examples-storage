@@ -1,13 +1,16 @@
-import { l } from '@dequanto/utils/$logger';
-import { USDC } from '@0xweb/eth/USDC/USDC';
-import { Config } from '@dequanto/Config'
-import { ChainAccountsService } from '@dequanto/ChainAccountsService';
-import { HardhatProvider } from '@dequanto/hardhat/HardhatProvider';
-import { ChainAccount } from '@dequanto/models/TAccount';
-import { $require } from '@dequanto/utils/$require';
-import { UAction } from 'atma-utest'
-import { $bigint } from '@dequanto/utils/$bigint';
 import { File } from 'atma-io';
+import { UAction } from 'atma-utest'
+import { ChainAccountService } from '@dequanto/ChainAccountService';
+import { HardhatProvider } from '@dequanto/hardhat/HardhatProvider';
+import { Config } from '@dequanto/config/Config';
+import { USDC } from '@0xc/eth/USDC/USDC';
+import { TAccount } from '@dequanto/models/TAccount';
+import { $bigint } from '@dequanto/utils/$bigint';
+import { l } from '@dequanto/utils/$logger';
+import { $require } from '@dequanto/utils/$require';
+import { $promise } from '@dequanto/utils/$promise';
+
+
 
 
 let config = await Config.fetch({
@@ -17,7 +20,7 @@ let config = await Config.fetch({
     "pin": "hello"
 });
 
-let accounts = new ChainAccountsService({ config });
+let accounts = new ChainAccountService({ config });
 let provider = new HardhatProvider();
 let client = provider.client('localhost');
 
@@ -29,7 +32,7 @@ UAction.create({
      */
     async 'create-accounts' () {
 
-        let [ foo, bar ] = await accounts.generateMany(['foo', 'bar'], 'hardhat');
+        let [ foo, bar ] = await accounts.createMany(['foo', 'bar'], 'hardhat');
 
         l`Created 2 accounts in ./config/accounts.json`
         l`foo bold<${foo.address}>`
@@ -42,18 +45,21 @@ UAction.create({
 
     async 'set-balance' () {
         let foo = await accounts.get('foo');
+        console.log(`foo`, foo.address);
         $require.notNull(foo, `"foo" account not found`);
 
         // First argument is the address - use same address as on mainnet, override only the RPC client
         let usdc = new USDC(void 0, client);
-        let balanceBefore = await usdc.storage.balances(foo.address);
+        let balanceBefore = await usdc.storage.balanceAndBlacklistStates(foo.address);
         l`Balance (${foo.address}) yellow<before>: bold<${balanceBefore}> wei`
 
         // Set balance of
         let decimals = await usdc.decimals();
+        console.log(`DECIMALS: ${decimals}`);
+        console.log(`DECIMALS: ${decimals}`);
         let amount = $bigint.toWei(50_000, decimals);
-        await usdc.storage.$set(`balances["${foo.address}"]`, amount);
-
+        await usdc.storage.$set(`balanceAndBlacklistStates["${foo.address}"]`, amount);
+        await $promise.wait(200);
         let balanceAfter = await usdc.balanceOf(foo.address);
         l`Balance green<after>: bold<${balanceAfter}> wei`;
     },
@@ -63,6 +69,8 @@ UAction.create({
         let bar = await accounts.get('bar');
         $require.notNull(foo, "foo");
         $require.notNull(bar, "bar");
+        console.log(`foo`, foo.address);
+        console.log(`bar`, bar.address);
 
         // Fund foo account
         await client.debug.setBalance(foo.address, 10n**18n);
@@ -79,7 +87,9 @@ UAction.create({
         let fooBalance = await usdc.storage.$get(`balances["${foo.address}"]`);
         l`Send ${fooBalance} usdc`;
 
-        let tx = await usdc.transfer(foo as ChainAccount, bar.address, fooBalance);
+
+
+        let tx = await usdc.transfer(foo as TAccount, bar.address, fooBalance);
         let receipt = await tx.wait();
     },
 
@@ -107,13 +117,15 @@ UAction.create({
         await usdc.storage.$set(`balances["${foo.address}"]`, 100n);
         await usdc.storage.$set(`balances["${bar.address}"]`, 0n);
 
+
+
         let barBalanceBefore = await usdc.balanceOf(bar.address);
         l`Bar Balance: ${barBalanceBefore}`;
 
         let fooBalanceBefore = await usdc.balanceOf(foo.address);
         l`Foo Balance: ${fooBalanceBefore}`;
 
-        let tx = await usdc.transfer(foo as ChainAccount, bar.address, 50n);
+        let tx = await usdc.transfer(foo as TAccount, bar.address, 50n);
         await tx.wait();
 
 

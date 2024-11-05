@@ -30,7 +30,8 @@ export class TestUtils {
             silent: true,
         });
         let stdout = shell.stdout.join('\n');
-        return stdout;
+        let stderr = shell.stderr.join('\n');
+        return { stdout, stderr };
     }
 }
 
