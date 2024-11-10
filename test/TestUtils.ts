@@ -12,12 +12,12 @@ export class TestUtils {
     static HOST = HOST
 
     @memd.deco.memoize()
-    static async start () {
+    static async start (shellOptions?: { silent?: boolean  }) {
         if (await isPortBusy(PORT) === false || await isServerRunning() === false) {
             let shell = new Shell({
                 command: 'node --openssl-legacy-provider ./node_modules/hardhat/internal/cli/cli.js node --hostname 127.0.0.1',
                 matchReady: /Started HTTP/i,
-                silent: true
+                silent: shellOptions?.silent ?? true
             });
             shell.run();
             await shell.onReadyAsync();

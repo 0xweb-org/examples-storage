@@ -1,4 +1,4 @@
-import { File } from 'atma-io';
+import { File, Directory } from 'atma-io';
 import { UAction } from 'atma-utest'
 import { ChainAccountService } from '@dequanto/ChainAccountService';
 import { HardhatProvider } from '@dequanto/hardhat/HardhatProvider';
@@ -11,8 +11,6 @@ import { $require } from '@dequanto/utils/$require';
 import { $promise } from '@dequanto/utils/$promise';
 
 
-
-
 let config = await Config.fetch({
     // overrides default path
     "config-accounts": "./config/accounts.json",
@@ -23,6 +21,7 @@ let config = await Config.fetch({
 let accounts = new ChainAccountService({ config });
 let provider = new HardhatProvider();
 let client = provider.client('localhost');
+
 
 
 UAction.create({
@@ -94,17 +93,32 @@ UAction.create({
     },
 
     async '!redeploy-with-new-compilation' () {
-        let path = '0xweb/eth/USDC/USDC/FiatTokenV2_1.sol';
-        let source = await File.readAsync<string>(path);
-        /**
-         * Simulate file edits by user
-         */
-        source = source.replaceAll(`_transfer(msg.sender, to, value);`, `_transfer(msg.sender, to, value + 5);`);
+        let sourceDir = '0xc/eth/USDC/USDC/';
+        let outputDir = `./test/bin/contracts/`;
 
-        let output = `./test/bin/contracts/USDC.sol`;
-        await File.writeAsync(output, source);
+        await Directory.copyTo(sourceDir, outputDir, { verbose: true })
 
-        let { bytecode } = await provider.compileSol(output);
+
+        let modifyFile = `Users/aloysius.chan/Repositories/circlefin/stablecoin-evm-private-eurc-mainnet-eth/contracts/v1/FiatTokenV1.sol`;
+
+        await File.replaceAsync(`${outputDir}${modifyFile}`
+            , `_transfer(msg.sender, to, value);`
+            , `_transfer(msg.sender, to, value + 5);`
+        );
+
+
+        let compileFile = `Users/aloysius.chan/Repositories/circlefin/stablecoin-evm-private-eurc-mainnet-eth/contracts/v2/FiatTokenV2_2.sol`;
+
+        let { bytecode, linkReferences } = await provider.compileSol(`${outputDir}${compileFile}`, {
+            paths: {
+                root: outputDir
+            }
+        });
+
+        bytecode = await provider.linkReferences(bytecode, linkReferences, {
+            "SignatureChecker": "0x800C32EaA2a6c93cF4CB51794450ED77fBfbB172"
+        });
+
         let usdc = new USDC(void 0, client);
 
         await client.debug.setCode(usdc.address, bytecode);
@@ -114,22 +128,23 @@ UAction.create({
 
         await client.debug.setBalance(foo.address, 10n ** 18n);
 
-        await usdc.storage.$set(`balances["${foo.address}"]`, 100n);
-        await usdc.storage.$set(`balances["${bar.address}"]`, 0n);
-
+        await usdc.storage.$set(`balanceAndBlacklistStates["${foo.address}"]`, 100n);
+        await usdc.storage.$set(`balanceAndBlacklistStates["${bar.address}"]`, 0n);
 
 
         let barBalanceBefore = await usdc.balanceOf(bar.address);
+        $require.eq(barBalanceBefore, 0n, `Bar balance should be 0 before transfer`);
         l`Bar Balance: ${barBalanceBefore}`;
 
         let fooBalanceBefore = await usdc.balanceOf(foo.address);
+        $require.eq(fooBalanceBefore, 100n, `Foo balance should be 0 before transfer`);
         l`Foo Balance: ${fooBalanceBefore}`;
 
         let tx = await usdc.transfer(foo as TAccount, bar.address, 50n);
         await tx.wait();
 
-
-        let barBalance = await usdc.balanceOf(bar.address);
-        l`Bar Balance: ${barBalance}`;
+        let barBalanceAfter = await usdc.balanceOf(bar.address);
+        $require.eq(barBalanceAfter, 55n, `Bar should have 50 transferred and +5 by modification`);
+        l`Bar Balance: ${barBalanceAfter}`;
     }
 });

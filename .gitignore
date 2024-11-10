@@ -7,3 +7,4 @@ config
 package.json
 package-lock.json
 0xweb.json
+/tsconfig*
