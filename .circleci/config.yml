@@ -24,7 +24,7 @@ jobs:
           command: npx 0xweb i 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48 --chain eth --name USDC
       - run:
           name: Run tests
-          command: npm run test
+          command: npx atma test
 
 workflows:
   # Inside the workflow, you provide the jobs you want to run, e.g this workflow runs the build-and-test job above.
