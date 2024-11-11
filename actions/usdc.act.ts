@@ -80,10 +80,10 @@ UAction.create({
         let barBalance = await usdc.balanceOf(bar.address);
         if (barBalance > 0n) {
             l`Reset bar USDC balance from ${barBalance} to 0`;
-            await usdc.storage.$set(`balances["${bar.address}"]`, 0n);
+            await usdc.storage.$set(`balanceAndBlacklistStates["${bar.address}"]`, 0n);
         }
 
-        let fooBalance = await usdc.storage.$get(`balances["${foo.address}"]`);
+        let fooBalance = await usdc.storage.$get(`balanceAndBlacklistStates["${foo.address}"]`);
         l`Send ${fooBalance} usdc`;
 
 
@@ -92,7 +92,7 @@ UAction.create({
         let receipt = await tx.wait();
     },
 
-    async '!redeploy-with-new-compilation' () {
+    async 'redeploy-with-new-compilation' () {
         let sourceDir = '0xc/eth/USDC/USDC/';
         let outputDir = `./test/bin/contracts/`;
 

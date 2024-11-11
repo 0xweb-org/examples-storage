@@ -12,7 +12,8 @@ UTest({
     },
     async 'should get current block' () {
         let { stdout, stderr } = await TestUtils.execute(`npx 0xweb block get latest --chain hardhat --no-color`);
-        has_(stdout, /Block\s+\d+/);
+        has_(stdout, /Block.+\d+/);
+        has_(stdout, /Hash.+0x/);
     },
     async 'should top up foo account' () {
         var { stdout }  = await TestUtils.execute(`npx atma act ./actions/usdc.act.ts -q "set-balance"`);
@@ -23,7 +24,7 @@ UTest({
     },
     async 'should transfer to bar account' () {
         var { stdout }  = await TestUtils.execute(`npx atma act ./actions/usdc.act.ts -q "transfer-balance"`);
-        has_(stdout, /Send 50000 usdc/);
+        has_(stdout, /Send 50000000000 usdc/);
 
         var { stdout }  = await TestUtils.execute(`npx 0xweb account balance bar USDC --config-accounts ./config/accounts.json --pin hello --chain hardhat`);
         has_(stdout, /Balance.+50000\b/)

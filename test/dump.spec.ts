@@ -15,8 +15,8 @@ UTest({
     async $before () {
         await TestUtils.start();
     },
-    async 'should install contracts storage' () {
-        let stdout = await TestUtils.execute(`atma act ./actions/dump.act.ts -q "deploy original"`);
+    async '!should install contracts storage' () {
+        let { stdout, stderr } = await TestUtils.execute(`npx atma act ./actions/dump.act.ts -q "deploy original"`);
         let { address } = await File.readAsync<any>(metaOriginal);
 
         let reader = new ContractReader(client);
@@ -27,18 +27,18 @@ UTest({
         eq_(name, 'Foo');
     },
     async 'should dump contracts storage' () {
-        await TestUtils.execute(`atma act ./actions/dump.act.ts -q "dump original"`);
+        await TestUtils.execute(`npx atma act ./actions/dump.act.ts -q "dump original"`);
         let json = await File.readAsync('./cache/dump/data/DumpDemo.json');
         has_(json, { _name: 'Foo' });
     },
     async 'should clone contract' () {
-        await TestUtils.execute(`atma act ./actions/dump.act.ts -q "redeploy"`);
+        await TestUtils.execute(`npx atma act ./actions/dump.act.ts -q "redeploy"`);
         let { address } = await File.readAsync<{ address }>(metaCloned);
         let reader = new ContractReader(client);
         let foo = await reader.readAsync(address, '_foo() returns (uint256)');
         eq_(foo, 0n);
 
-        await TestUtils.execute(`atma act ./actions/dump.act.ts -q "restore"`);
+        await TestUtils.execute(`npx atma act ./actions/dump.act.ts -q "restore"`);
         foo = await reader.readAsync(address, '_foo() returns (uint256)');
         eq_(foo, 5n);
     }

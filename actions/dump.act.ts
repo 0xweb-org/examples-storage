@@ -1,5 +1,5 @@
-import { Config } from '@dequanto/Config'
-import { ChainAccountsService } from '@dequanto/ChainAccountsService';
+import { Config } from '@dequanto/config/Config'
+import { ChainAccountService } from '@dequanto/ChainAccountService';
 import { HardhatProvider } from '@dequanto/hardhat/HardhatProvider';
 import { UAction } from 'atma-utest'
 import { File } from 'atma-io'
@@ -13,7 +13,7 @@ let config = await Config.fetch({
     "pin": "hello"
 });
 
-let accounts = new ChainAccountsService({ config });
+let accounts = new ChainAccountService({ config });
 let provider = new HardhatProvider();
 let deployer = provider.deployer(1);
 let client = provider.client('localhost');
